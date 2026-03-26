@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Functions Mastery | Hillary Homai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Layout --- */
+        .top-banner {
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand h1 { font-size: 1.5rem; color: var(--primary-dark); }
+        
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item {
+            background: #f1f5f9;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* --- Components --- */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .hero { text-align: center; padding: 60px 20px; }
+        .hero h2 { font-size: 3rem; margin-bottom: 20px; color: var(--text-main); }
+        .hero p { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 40px; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        /* --- Code Visualization --- */
+        .code-block {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 30px;
+            border-radius: var(--radius);
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            position: relative;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        .code-part {
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .code-part:hover {
+            background: rgba(255,255,255,0.1);
+            border-bottom-color: var(--primary);
+        }
+
+        .highlight-def { color: #f472b6; font-weight: bold; }
+        .highlight-name { color: #60a5fa; }
+        .highlight-bracket { color: #fbbf24; }
+        .highlight-string { color: #34d399; }
+        .highlight-comment { color: #94a3b8; font-style: italic; }
+
+        .info-panel {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+            display: none;
+        }
+
+        /* --- Interaction Styles --- */
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover { border-color: var(--primary); background: #f8fafc; }
+        .option-btn.correct { border-color: var(--accent); background: #ecfdf5; }
+        .option-btn.wrong { border-color: var(--error); background: #fef2f2; }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* --- Anatomy Lab --- */
+        .anatomy-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+        }
+
+        .explanation-box {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: var(--radius);
+            min-height: 200px;
+        }
+
+        /* --- Drag & Drop Reordering --- */
+        .sort-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .sort-item {
+            background: white;
+            padding: 12px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* --- Comparisons --- */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .comparison-box {
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* --- Timeline --- */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+        .step.active { opacity: 1; }
+        .step-num {
+            width: 30px; height: 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* --- Final Summary --- */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .badge {
+            filter: grayscale(1);
+            opacity: 0.3;
+            transition: all 0.5s;
+        }
+        .badge.earned {
+            filter: grayscale(0);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        svg { width: 48px; height: 48px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-banner">Curriculum Designer and Developer Hillary Homai</div>
+
+    <header>
+        <div class="brand">
+            <h1>Python Functions</h1>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-item">Points: <span id="score">0</span></div>
+            <div class="stat-item" id="mastery-level">Level: Novice</div>
+            <div class="progress-container">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app">
+        <section id="sec-1" class="section active">
+            <div class="hero">
+                <h2>Master the Logic of Functions</h2>
+                <p>Functions are the building blocks of clean, powerful code. We'll break down the syntax, the storage, and the execution—no fluff, just mastery.</p>
+                <button class="btn" onclick="nextSection(2)">
+                    Begin Learning Journey
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <section id="sec-2" class="section">
+            <div class="card">
+                <h3>1. The "Why" of Functions</h3>
+                <p style="margin-bottom:20px;">Imagine you are building a game. Every time a player wins, you need to display their name, add 100 points, and play a sound. Without functions, your code looks like this:</p>
+                
+                <div class="comparison">
+                    <div class="comparison-box">
+                        <strong style="color:var(--error)">Messy (Repetitive)</strong>
+                        <div class="code-block" style="font-size:0.9rem">
+                            print("Win!")<br>score += 100<br>play_sound()<br><br>
+                            print("Win!")<br>score += 100<br>play_sound()<br><br>
+                            print("Win!")<br>score += 100<br>play_sound()
+                        </div>
+                    </div>
+                    <div class="comparison-box">
+                        <strong style="color:var(--accent)">Organized (Function)</strong>
+                        <div class="code-block" style="font-size:0.9rem">
+                            <span class="highlight-def">def</span> celebrate():<br>
+                            &nbsp;&nbsp;print("Win!")<br>
+                            &nbsp;&nbsp;score += 100<br>
+                            &nbsp;&nbsp;play_sound()<br><br>
+                            <span class="highlight-comment"># Now just use the name!</span><br>
+                            celebrate()<br>
+                            celebrate()
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-box" style="margin-top:30px;">
+                    <p><strong>Check for Understanding:</strong> Why is the "Messy" version problematic?</p>
+                    <div class="option-grid">
+                        <button class="option-btn" onclick="checkAnswer(this, true, 'Correct! If you want to change points to 200, you have to find and fix it everywhere in the messy code. Functions let you update in one place.')">It's hard to update. If something changes, you have to change it in every spot.</button>
+                        <button class="option-btn" onclick="checkAnswer(this, false, 'Actually, computers can handle repeat code easily. This is about making code easier for HUMANS to read and manage.')">Computers get confused by seeing the same line twice.</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <button class="btn" style="margin-top:30px; display:none" id="next-btn-2" onclick="nextSection(3)">Next: Anatomy Lab</button>
+            </div>
+        </section>
+
+        <section id="sec-3" class="section">
+            <div class="card">
+                <h3>2. Function Anatomy Lab</h3>
+                <p>Click each part of the code to see exactly what it does.</p>
+                
+                <div class="anatomy-container">
+                    <div class="code-block" style="font-size: 1.5rem; line-height: 2;">
+                        <span class="code-part highlight-def" data-info="<strong>def</strong> is short for 'define'. It tells Python: 'Listen up! I am about to create a new set of instructions.'">def</span>
+                        <span class="code-part highlight-name" data-info="<strong>greet</strong> is the name of your function. You choose this name! It should describe what the function does.">greet</span><span class="code-part highlight-bracket" data-info="<strong>Parentheses ()</strong> indicate this is a function. Later, we can put inputs (parameters) inside them. For now, they are empty because we don't need extra info.">()</span><span class="code-part" data-info="The <strong>Colon :</strong> is non-negotiable. It signals that the instructions are about to start on the next line.">:</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-part highlight-string" data-info="The <strong>Indentation</strong> (the empty space) is critical. Everything indented belongs TO the function. If you stop indenting, the function is over.">print("Hello")</span>
+                    </div>
+                    <div class="explanation-box" id="anatomy-explanation">
+                        <p style="color:var(--text-muted)">Click a code segment to reveal its purpose.</p>
+                    </div>
+                </div>
+
+                <div class="question-box" style="margin-top:30px;">
+                    <p><strong>Critical Check:</strong> What would happen if we removed the indentation from the <code>print</code> line?</p>
+                    <div class="option-grid">
+                        <button class="option-btn" onclick="checkAnswer(this, true, 'Correct. Python uses indentation to know which lines belong inside the function box.')">Python wouldn't know the print line belongs inside 'greet'.</button>
+                        <button class="option-btn" onclick="checkAnswer(this, false, 'The code would still run, it would just look slightly uglier.')">Nothing. Indentation is just for visual style.</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <button class="btn" style="margin-top:30px; display:none" id="next-btn-3" onclick="nextSection(4)">Next: Define vs Call</button>
+            </div>
+        </section>
+
+        <section id="sec-4" class="section">
+            <div class="card">
+                <h3>3. Defining vs. Calling</h3>
+                <p>There are two distinct phases to a function. Most beginners get these mixed up.</p>
+                
+                <div class="comparison">
+                    <div class="comparison-box">
+                        <h4>Phase A: Defining</h4>
+                        <div class="code-block" style="font-size:0.9rem">
+                            <span class="highlight-def">def</span> announce():<br>
+                            &nbsp;&nbsp;print("Starting now!")
+                        </div>
+                        <p><small>The "Recipe". Python reads it and stores it in memory, but <strong>nothing happens on your screen yet.</strong></small></p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>Phase B: Calling</h4>
+                        <div class="code-block" style="font-size:0.9rem">
+                            announce()
+                        </div>
+                        <p><small>The "Action". You tell Python to actually <strong>execute</strong> the instructions you stored earlier.</small></p>
+                    </div>
+                </div>
+
+                <div id="def-call-game" style="margin-top:30px;">
+                    <p><strong>Quick Sort:</strong> Is the code below <strong>Defining</strong> (Storing a recipe) or <strong>Calling</strong> (Doing it)?</p>
+                    <div id="current-task" class="code-block" style="text-align:center; font-size:1.4rem;">def calculate():</div>
+                    <div class="option-grid">
+                        <button class="option-btn" onclick="handleDefCall('define')">Defining</button>
+                        <button class="option-btn" onclick="handleDefCall('call')">Calling</button>
+                    </div>
+                    <p style="margin-top:10px;">Progress: <span id="def-call-progress">0/5</span></p>
+                </div>
+                <button class="btn" style="margin-top:30px; display:none" id="next-btn-4" onclick="nextSection(5)">Next: Storing vs Displaying</button>
+            </div>
+        </section>
+
+        <section id="sec-5" class="section">
+            <div class="card">
+                <h3>4. Displayed vs. Stored</h3>
+                <p>This is the "Boss Level" of beginner confusion. Let's solve it forever.</p>
+                
+                <div class="timeline">
+                    <div class="step" id="step1">
+                        <div class="step-num">1</div>
+                        <div><strong>print("Hello")</strong> is like a <strong>Billboard</strong>. It shows a message to the world (the user), but once the car drives past, that information is gone. The program cannot "use" that string later.</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-num">2</div>
+                        <div><strong>return 8</strong> is like a <strong>Package</strong>. The function finishes its work and hands a value back to the program. The world sees nothing, but the program now "holds" that value.</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-num">3</div>
+                        <div><strong>result = add(3, 5)</strong> is the <strong>Storage</strong>. Because <code>add</code> returned a value (8), the variable <code>result</code> catches it and saves it for later.</div>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <div class="code-block" style="font-size:1rem">
+                        <span class="highlight-def">def</span> multiply(x, y):<br>
+                        &nbsp;&nbsp;<span class="highlight-def">return</span> x * y<br><br>
+                        answer = multiply(2, 5)
+                    </div>
+                    <p><strong>Scenario:</strong> After the code above runs, what does the user see on their screen?</p>
+                    <div class="option-grid">
+                        <button class="option-btn" onclick="checkAnswer(this, true, 'Exactly! Return sends the value to the variable \'answer\', but since there is no \'print\' command, the screen stays blank.')">Absolutely nothing.</button>
+                        <button class="option-btn" onclick="checkAnswer(this, false, 'Nope. \'return\' is quiet. It doesn\'t talk to the screen.')">The number 10.</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <button class="btn" style="margin-top:30px; display:none" id="next-btn-5" onclick="nextSection(6)">Next: Final Mastery Challenge</button>
+            </div>
+        </section>
+
+        <section id="sec-6" class="section">
+            <div class="card">
+                <h3>🏆 Final Mastery Challenge</h3>
+                <p>Complete these tasks to earn your Python Functions badge.</p>
+                
+                <div id="final-challenge">
+                    <div id="quiz-container">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-7" class="section">
+            <div class="card" style="text-align:center">
+                <h2 style="color:var(--accent)">Mastery Achieved!</h2>
+                <p id="final-stats">You scored 100 points.</p>
+                
+                <div class="badge-grid">
+                    <div class="badge earned" id="badge-syntax">
+                        <svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <p>Syntax</p>
+                    </div>
+                    <div class="badge earned" id="badge-logic">
+                        <svg viewBox="0 0 24 24" fill="var(--secondary)"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                        <p>Logic</p>
+                    </div>
+                    <div class="badge earned" id="badge-flow">
+                        <svg viewBox="0 0 24 24" fill="var(--accent)"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <p>Data Flow</p>
+                    </div>
+                </div>
+
+                <div style="text-align:left; background:#f8fafc; padding:20px; border-radius:8px;">
+                    <h4>Key Takeaways:</h4>
+                    <ul style="margin-left:20px; margin-top:10px;">
+                        <li><strong>def</strong> introduces a new function.</li>
+                        <li><strong>()</strong> are for inputs (parameters).</li>
+                        <li><strong>Indentation</strong> defines the function's body.</li>
+                        <li><strong>Defining</strong> stores code; <strong>Calling</strong> runs it.</li>
+                        <li><strong>return</strong> gives data back to the program.</li>
+                    </ul>
+                </div>
+
+                <button class="btn" style="margin-top:30px;" onclick="location.reload()">Restart Curriculum</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- State Management ---
+        let state = {
+            score: 0,
+            currentSection: 1,
+            progress: 0,
+            defCallGameIndex: 0,
+            quizIndex: 0
+        };
+
+        const totalSections = 7;
+
+        function updateUI() {
+            document.getElementById('score').innerText = state.score;
+            const progress = ((state.currentSection - 1) / (totalSections - 1)) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            let level = "Novice";
+            if (state.score > 100) level = "Apprentice";
+            if (state.score > 250) level = "Developer";
+            if (state.score > 400) level = "Master";
+            document.getElementById('mastery-level').innerText = `Level: ${level}`;
+        }
+
+        function nextSection(sec) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sec-${sec}`).classList.add('active');
+            state.currentSection = sec;
+            window.scrollTo(0,0);
+            updateUI();
+        }
+
+        // --- Anatomy Lab Logic ---
+        document.querySelectorAll('.code-part').forEach(part => {
+            part.addEventListener('click', function() {
+                const info = this.getAttribute('data-info');
+                const panel = document.getElementById('anatomy-explanation');
+                panel.innerHTML = `<p>${info}</p>`;
+                panel.style.display = 'block';
+                panel.style.borderLeftColor = window.getComputedStyle(this).color;
+            });
+        });
+
+        // --- Universal Answer Check ---
+        function checkAnswer(btn, isCorrect, feedbackText) {
+            const parent = btn.parentElement;
+            const feedbackDiv = parent.nextElementSibling;
+            
+            // Prevent multiple clicks
+            if (parent.querySelector('.correct') || parent.querySelector('.wrong')) return;
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                state.score += 50;
+                feedbackDiv.style.color = "var(--accent)";
+                // Show next button for the section
+                const nextBtn = document.getElementById(`next-btn-${state.currentSection}`);
+                if (nextBtn) nextBtn.style.display = 'inline-flex';
+            } else {
+                btn.classList.add('wrong');
+                state.score = Math.max(0, state.score - 10);
+                feedbackDiv.style.color = "var(--error)";
+            }
+            
+            feedbackDiv.innerHTML = feedbackText;
+            feedbackDiv.style.display = 'block';
+            updateUI();
+        }
+
+        // --- Def vs Call Mini Game ---
+        const defCallTasks = [
+            { code: "def start_game():", ans: "define" },
+            { code: "move_player()", ans: "call" },
+            { code: "def save_score(points):", ans: "define" },
+            { code: "print('Game Over')", ans: "call" },
+            { code: "calculate_health()", ans: "call" }
+        ];
+
+        function handleDefCall(choice) {
+            const task = defCallTasks[state.defCallGameIndex];
+            if (choice === task.ans) {
+                state.score += 20;
+            } else {
+                alert("Not quite. Remember: 'def' is for defining. Just the name() is for calling.");
+            }
+            
+            state.defCallGameIndex++;
+            if (state.defCallGameIndex < defCallTasks.length) {
+                document.getElementById('current-task').innerText = defCallTasks[state.defCallGameIndex].code;
+                document.getElementById('def-call-progress').innerText = `${state.defCallGameIndex}/5`;
+            } else {
+                document.getElementById('def-call-game').innerHTML = "<h4 style='color:var(--accent)'>Game Complete! You know the difference.</h4>";
+                document.getElementById('next-btn-4').style.display = 'inline-flex';
+            }
+            updateUI();
+        }
+
+        // --- Final Quiz ---
+        const quizData = [
+            {
+                q: "What is the purpose of the 'return' keyword?",
+                options: [
+                    "To print text to the screen for the user.",
+                    "To send a value back to the line of code that called the function.",
+                    "To stop the whole program from running.",
+                    "To create a new variable name."
+                ],
+                correct: 1
+            },
+            {
+                q: "In 'def calculate(price, tax):', what are price and tax?",
+                options: [
+                    "Callers",
+                    "Return values",
+                    "Parameters (inputs)",
+                    "Indents"
+                ],
+                correct: 2
+            }
+        ];
+
+        function loadQuiz() {
+            const container = document.getElementById('quiz-container');
+            const item = quizData[state.quizIndex];
+            
+            container.innerHTML = `
+                <div class="question-box">
+                    <p style="font-weight:600; font-size:1.1rem; margin-bottom:15px;">Question ${state.quizIndex + 1}: ${item.q}</p>
+                    <div class="option-grid">
+                        ${item.options.map((opt, i) => `
+                            <button class="option-btn" onclick="checkQuiz(${i})">${opt}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkQuiz(idx) {
+            const item = quizData[state.quizIndex];
+            if (idx === item.correct) {
+                state.score += 100;
+                state.quizIndex++;
+                if (state.quizIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    document.getElementById('final-stats').innerText = `Final Score: ${state.score} Points`;
+                    nextSection(7);
+                }
+            } else {
+                alert("Incorrect. Think about the specific purpose of that code part!");
+            }
+            updateUI();
+        }
+
+        // Initialize quiz
+        loadQuiz();
+        updateUI();
+
+    </script>
+</body>
+</html>
